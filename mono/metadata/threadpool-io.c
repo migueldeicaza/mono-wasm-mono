@@ -679,6 +679,8 @@ mono_threadpool_io_remove_domain_jobs (MonoDomain *domain)
 
 #else
 
+#include <mono/metadata/threadpool-io.h>
+
 void
 ves_icall_System_IOSelector_Add (gpointer handle, MonoIOSelectorJob *job)
 {
