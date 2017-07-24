@@ -61,6 +61,10 @@ static inline void mono_memory_write_barrier (void)
 {
 	mono_memory_barrier ();
 }
+#elif defined(TARGET_WASM32)
+# define mono_memory_barrier()
+# define mono_memory_read_barrier()
+# define mono_memory_write_barrier()
 #else
 #error "Don't know how to do memory barriers!"
 #endif

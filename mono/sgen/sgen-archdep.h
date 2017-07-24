@@ -65,6 +65,10 @@
 
 #define REDZONE_SIZE	0
 
+#elif defined(TARGET_WASM32)
+
+#define REDZONE_SIZE	0
+
 #endif
 
 #endif /* __MONO_SGENARCHDEP_H__ */

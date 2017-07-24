@@ -433,10 +433,18 @@ mono_unwind_ops_encode_full (GSList *unwind_ops, guint32 *out_len, gboolean enab
 			if (reg > 63) {
 				*p ++ = DW_CFA_offset_extended_sf;
 				encode_uleb128 (reg, p, &p);
+#if DWARF_DATA_ALIGN == 0
+				encode_sleb128 (op->val, p, &p);
+#else
 				encode_sleb128 (op->val / DWARF_DATA_ALIGN, p, &p);
+#endif
 			} else {
 				*p ++ = DW_CFA_offset | reg;
+#if DWARF_DATA_ALIGN == 0
+				encode_uleb128 (op->val, p, &p);
+#else
 				encode_uleb128 (op->val / DWARF_DATA_ALIGN, p, &p);
+#endif
 			}
 			break;
 		case DW_CFA_remember_state:

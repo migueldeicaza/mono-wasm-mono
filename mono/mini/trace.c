@@ -35,8 +35,14 @@
 
 #ifdef __GNUC__
 
+#if defined(TARGET_WASM32)
+// TODO
+#define RETURN_ADDRESS_N(N) ((void *)0xdeadbeef)
+#define RETURN_ADDRESS() RETURN_ADDRESS_N(0)
+#else
 #define RETURN_ADDRESS_N(N) (__builtin_extract_return_addr (__builtin_return_address (N)))
 #define RETURN_ADDRESS() RETURN_ADDRESS_N(0)
+#endif
 
 #elif defined(_MSC_VER)
 

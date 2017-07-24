@@ -831,6 +831,22 @@ typedef struct ucontext MonoContext;
 		: "memory"			\
 	)
 
+#elif defined(TARGET_WASM32)
+
+// TODO
+
+#define MONO_ARCH_HAS_MONO_CONTEXT 1
+
+typedef int MonoContext;
+
+#define MONO_CONTEXT_GET_IP(ctx) 0
+#define MONO_CONTEXT_SET_IP(ctx, ip)
+#define MONO_CONTEXT_GET_BP(ctx) 0
+#define MONO_CONTEXT_SET_BP(ctx, ip)
+#define MONO_CONTEXT_GET_SP(ctx) 0
+#define MONO_CONTEXT_SET_SP(ctx, ip)
+#define MONO_CONTEXT_GET_CURRENT(ctx) 0
+
 #else
 
 #error "Implement mono-context for the current arch"

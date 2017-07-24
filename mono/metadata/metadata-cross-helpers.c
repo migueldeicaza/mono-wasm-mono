@@ -26,6 +26,8 @@ dump_arch (void)
 	g_print ("#ifdef TARGET_ARM\n");
 #elif defined (TARGET_ARM64)
 	g_print ("#ifdef TARGET_ARM64\n");
+#elif defined (TARGET_WASM32)
+	g_print ("#ifdef TARGET_WASM32\n");
 #else
 	return 0;
 #endif
@@ -84,7 +86,9 @@ mono_dump_metadata_offsets (void)
 	g_print ("#if !defined (DISABLE_METADATA_OFFSETS)\n");
 	g_print ("#define USED_CROSS_COMPILER_OFFSETS\n");
 
+#ifndef DISABLE_JIT_OFFSETS
 #define DISABLE_JIT_OFFSETS
+#endif
 #define DECL_OFFSET2(struct,field,offset) this_should_not_happen
 #define DECL_ALIGN2(type,size) this_should_not_happen
 
@@ -113,7 +117,9 @@ mono_metadata_cross_helpers_run (void)
 #if defined (HAS_CROSS_COMPILER_OFFSETS) && !defined (MONO_CROSS_COMPILE)
 	gboolean is_broken = FALSE;
 
+#ifndef DISABLE_JIT_OFFSETS
 #define DISABLE_JIT_OFFSETS
+#endif
 #define USE_CROSS_COMPILE_OFFSETS
 #define DECL_OFFSET(struct,field) this_should_not_happen_for_cross_fields
 #define DECL_OFFSET2(struct,field,offset) \

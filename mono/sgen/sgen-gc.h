@@ -1106,7 +1106,9 @@ gboolean nursery_canaries_enabled (void);
 static inline void
 sgen_dummy_use (gpointer v)
 {
-#if defined(__GNUC__)
+#if defined(TARGET_WASM32)
+	// TODO
+#elif defined(__GNUC__)
 	__asm__ volatile ("" : "=r"(v) : "r"(v));
 #elif defined(_MSC_VER)
 	static volatile gpointer ptr;

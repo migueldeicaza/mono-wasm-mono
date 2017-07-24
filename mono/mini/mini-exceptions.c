@@ -3297,6 +3297,10 @@ mono_llvm_load_exception (void)
 
 	MonoException *mono_ex = (MonoException*)mono_gchandle_get_target (jit_tls->thrown_exc);
 
+#if defined(TARGET_WASM32)
+	if (0) {
+	}
+#else
 	if (mono_ex->trace_ips) {
 		GList *trace_ips = NULL;
 		gpointer ip = __builtin_return_address (0);
@@ -3323,7 +3327,9 @@ mono_llvm_load_exception (void)
 
 		// FIXME:
 		//MONO_OBJECT_SETREF (mono_ex, stack_trace, ves_icall_System_Exception_get_trace (mono_ex));
-	} else {
+	} 
+#endif
+	else {
 		MONO_OBJECT_SETREF (mono_ex, trace_ips, mono_array_new_checked (mono_domain_get (), mono_defaults.int_class, 0, &error));
 		mono_error_assert_ok (&error);
 		MONO_OBJECT_SETREF (mono_ex, stack_trace, mono_array_new_checked (mono_domain_get (), mono_defaults.stack_frame_class, 0, &error));

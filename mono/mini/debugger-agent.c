@@ -95,6 +95,10 @@
 #define DISABLE_DEBUGGER_AGENT 1
 #endif
 
+#if defined(TARGET_WASM32)
+#define DISABLE_DEBUGGER_AGENT 1
+#endif
+
 #ifndef DISABLE_DEBUGGER_AGENT
 
 #include <mono/utils/mono-os-mutex.h>
