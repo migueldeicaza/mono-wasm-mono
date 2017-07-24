@@ -1240,6 +1240,3 @@
 
 /* ... */
 /* #undef __mono_ppc64__ */
-
-
-#define HAVE_SGEN_GC 1
