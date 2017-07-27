@@ -362,6 +362,33 @@ mono_mprotect (void *addr, size_t length, int flags)
 	return mprotect (addr, length, prot);
 }
 
+#elif defined (TARGET_WASM32)
+
+int
+mono_pagesize (void)
+{
+	return 4096;
+}
+
+int
+mono_valloc_granule (void)
+{
+	return mono_pagesize ();
+}
+
+void*
+mono_valloc (void *addr, size_t length, int flags, MonoMemAccountType type)
+{
+	return aligned_alloc (mono_pagesize (), length);
+}
+
+void*
+mono_valloc_aligned (size_t size, size_t alignment, int flags, MonoMemAccountType type)
+{
+	return aligned_alloc (alignment, size);
+}
+
+#define HAVE_VALLOC_ALIGNED
 #else
 
 /* dummy malloc-based implementation */
