@@ -769,6 +769,10 @@ mono_cpu_count (void)
 	}
 #endif
 
+#elif defined (TARGET_WASM32)
+
+	return 1;
+
 #else
 
 #ifdef HAVE_SCHED_GETAFFINITY
