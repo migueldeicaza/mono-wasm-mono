@@ -2435,6 +2435,7 @@ emit_thread_interrupt_checkpoint_call (MonoMethodBuilder *mb, gpointer checkpoin
 	mono_mb_emit_byte (mb, CEE_POP);
 	
 	mono_mb_patch_branch (mb, pos_noabort);
+#endif
 }
 
 static void
