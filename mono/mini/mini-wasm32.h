@@ -13,6 +13,7 @@
 #define MONO_MAX_FREGS 0
 
 #define MONO_ARCH_VTABLE_REG 0
+#define MONO_ARCH_GSHAREDVT_SUPPORTED 1
 
 struct MonoLMF {
     guint32 previous_lmf;
