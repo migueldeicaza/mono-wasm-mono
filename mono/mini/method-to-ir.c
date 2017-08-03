@@ -76,6 +76,10 @@
 #include "aot-compiler.h"
 #include "mini-llvm.h"
 
+#if defined(COMPILE_WASM32) && defined(MONO_ARCH_SIMD_INTRINSICS)
+# undef MONO_ARCH_SIMD_INTRINSICS
+#endif
+
 #define BRANCH_COST 10
 #define INLINE_LENGTH_LIMIT 20
 
@@ -4433,7 +4437,7 @@ mini_emit_ldelema_1_ins (MonoCompile *cfg, MonoClass *klass, MonoInst *arr, Mono
 	if (bcheck)
 		MONO_EMIT_BOUNDS_CHECK (cfg, array_reg, MonoArray, max_length, index2_reg);
 
-#if defined(TARGET_X86) || defined(TARGET_AMD64)
+#if (defined(TARGET_X86) || defined(TARGET_AMD64)) && !defined(COMPILE_WASM32)
 	if (size == 1 || size == 2 || size == 4 || size == 8) {
 		static const int fast_log2 [] = { 1, 0, 1, -1, 2, -1, -1, -1, 3 };
 
@@ -4923,7 +4927,7 @@ mini_emit_inst_for_method (MonoCompile *cfg, MonoMethod *cmethod, MonoMethodSign
 #endif	
 			MONO_EMIT_BOUNDS_CHECK (cfg, args [0]->dreg, MonoString, length, index_reg);
 
-#if defined(TARGET_X86) || defined(TARGET_AMD64)
+#if (defined(TARGET_X86) || defined(TARGET_AMD64)) && !defined(COMPILE_WASM32)
 			EMIT_NEW_X86_LEA (cfg, ins, args [0]->dreg, index_reg, 1, MONO_STRUCT_OFFSET (MonoString, chars));
 			add_reg = ins->dreg;
 			EMIT_NEW_LOAD_MEMBASE (cfg, ins, OP_LOADU2_MEMBASE, dreg, 
@@ -8019,9 +8023,11 @@ mono_method_to_ir (MonoCompile *cfg, MonoMethod *method, MonoBasicBlock *start_b
 			--sp;
 
 #ifdef TARGET_X86
+#if !defined(COMPILE_WASM32)
 			if (sp [0]->type == STACK_R8)
 				/* we need to pop the value from the x86 FP stack */
 				MONO_EMIT_NEW_UNALU (cfg, OP_X86_FPOP, -1, sp [0]->dreg);
+#endif
 #endif
 			break;
 		case CEE_JMP: {
@@ -10473,6 +10479,7 @@ mono_method_to_ir (MonoCompile *cfg, MonoMethod *method, MonoBasicBlock *start_b
 
 					MONO_EMIT_NULL_CHECK (cfg, sp [0]->dreg);
 
+#if !defined(COMPILE_WASM32)
 					if (sp [0]->opcode == OP_LDADDR && klass->simd_type && cfg->opt & MONO_OPT_SIMD) {
 						ins = mono_emit_simd_field_load (cfg, field, sp [0]);
 						if (ins) {
@@ -10482,6 +10489,7 @@ mono_method_to_ir (MonoCompile *cfg, MonoMethod *method, MonoBasicBlock *start_b
 							break;
 						}
 					}
+#endif
 
 					MonoInst *field_add_inst = sp [0];
 					if (mini_is_gsharedvt_klass (klass)) {
@@ -12814,7 +12822,7 @@ mono_op_to_op_imm (int opcode)
 	case OP_STOREI4_MEMBASE_REG:
 		return OP_STOREI4_MEMBASE_IMM;
 
-#if defined(TARGET_X86) || defined (TARGET_AMD64)
+#if (defined(TARGET_X86) || defined (TARGET_AMD64)) && !defined(COMPILE_WASM32)
 	case OP_X86_PUSH:
 		return OP_X86_PUSH_IMM;
 	case OP_X86_COMPARE_MEMBASE_REG:
@@ -12901,6 +12909,7 @@ stind_to_store_membase (int opcode)
 int
 mono_load_membase_to_load_mem (int opcode)
 {
+#if !defined(COMPILE_WASM32)
 	// FIXME: Add a MONO_ARCH_HAVE_LOAD_MEM macro
 #if defined(TARGET_X86) || defined(TARGET_AMD64)
 	switch (opcode) {
@@ -12920,6 +12929,7 @@ mono_load_membase_to_load_mem (int opcode)
 #endif
 	}
 #endif
+#endif
 
 	return -1;
 }
@@ -12927,6 +12937,7 @@ mono_load_membase_to_load_mem (int opcode)
 static inline int
 op_to_op_dest_membase (int store_opcode, int opcode)
 {
+#if !defined(COMPILE_WASM32)
 #if defined(TARGET_X86)
 	if (!((store_opcode == OP_STORE_MEMBASE_REG) || (store_opcode == OP_STOREI4_MEMBASE_REG)))
 		return -1;
@@ -13016,6 +13027,7 @@ op_to_op_dest_membase (int store_opcode, int opcode)
 		return OP_NOP;
 	}
 #endif
+#endif
 
 	return -1;
 }
@@ -13023,7 +13035,7 @@ op_to_op_dest_membase (int store_opcode, int opcode)
 static inline int
 op_to_op_store_membase (int store_opcode, int opcode)
 {
-#if defined(TARGET_X86) || defined(TARGET_AMD64)
+#if (defined(TARGET_X86) || defined(TARGET_AMD64)) && !defined(COMPILE_WASM32)
 	switch (opcode) {
 	case OP_ICEQ:
 		if (store_opcode == OP_STOREI1_MEMBASE_REG)
@@ -13040,6 +13052,7 @@ op_to_op_store_membase (int store_opcode, int opcode)
 static inline int
 op_to_op_src1_membase (MonoCompile *cfg, int load_opcode, int opcode)
 {
+#if !defined(COMPILE_WASM32)
 #ifdef TARGET_X86
 	/* FIXME: This has sign extension issues */
 	/*
@@ -13097,6 +13110,7 @@ op_to_op_src1_membase (MonoCompile *cfg, int load_opcode, int opcode)
 		break;
 	}
 #endif
+#endif
 
 	return -1;
 }
@@ -13104,6 +13118,7 @@ op_to_op_src1_membase (MonoCompile *cfg, int load_opcode, int opcode)
 static inline int
 op_to_op_src2_membase (MonoCompile *cfg, int load_opcode, int opcode)
 {
+#if !defined(COMPILE_WASM32)
 #ifdef TARGET_X86
 	if (!((load_opcode == OP_LOAD_MEMBASE) || (load_opcode == OP_LOADI4_MEMBASE) || (load_opcode == OP_LOADU4_MEMBASE)))
 		return -1;
@@ -13158,6 +13173,7 @@ op_to_op_src2_membase (MonoCompile *cfg, int load_opcode, int opcode)
 			return OP_AMD64_XOR_REG_MEMBASE;
 		}
 	}
+#endif
 #endif
 
 	return -1;

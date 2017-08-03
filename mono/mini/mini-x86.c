@@ -19,6 +19,10 @@
 #include <unistd.h>
 #endif
 
+#if defined(COMPILE_WASM32)
+# define MONO_GENERATING_OFFSETS 1 // FIXME
+#endif
+
 #include <mono/metadata/abi-details.h>
 #include <mono/metadata/appdomain.h>
 #include <mono/metadata/debug-helpers.h>

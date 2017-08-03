@@ -225,6 +225,11 @@ llvm_ins_info[] = {
 #define TRACE_FAILURE(msg)
 #endif
 
+#if defined(COMPILE_WASM32)
+# undef TARGET_X86
+# undef TARGET_AMD64
+#endif
+
 #ifdef TARGET_X86
 #define IS_TARGET_X86 1
 #else

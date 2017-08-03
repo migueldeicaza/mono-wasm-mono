@@ -17,6 +17,10 @@
 #include <ucontext.h>
 #endif
 
+#if defined(COMPILE_WASM32)
+# define MONO_GENERATING_OFFSETS 1 // FIXME
+#endif
+
 #include <mono/metadata/abi-details.h>
 #include <mono/arch/x86/x86-codegen.h>
 #include <mono/metadata/appdomain.h>

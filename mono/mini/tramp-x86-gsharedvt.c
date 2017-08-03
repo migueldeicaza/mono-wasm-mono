@@ -9,6 +9,12 @@
  * Licensed under the MIT license. See LICENSE file in the project root for full license information.
  */
 #include "mini.h"
+
+#if defined(COMPILE_WASM32)
+# define MONO_GENERATING_OFFSETS 1 // FIXME
+# undef MONO_CROSS_COMPILE
+#endif
+
 #include <mono/metadata/abi-details.h>
 
 #ifdef MONO_ARCH_GSHAREDVT_SUPPORTED
