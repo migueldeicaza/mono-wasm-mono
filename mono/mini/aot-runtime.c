@@ -1790,6 +1790,7 @@ check_usable (MonoAssembly *assembly, MonoAotFileInfo *info, guint8 *blob, char 
 		usable = FALSE;
 	}
 
+#if !defined(TARGET_WASM32)
 	mono_arch_cpu_optimizations (&excluded_cpu_optimizations);
 	if (info->opts & excluded_cpu_optimizations) {
 		msg = g_strdup_printf ("compiled with unsupported CPU optimizations");
@@ -1800,6 +1801,7 @@ check_usable (MonoAssembly *assembly, MonoAotFileInfo *info, guint8 *blob, char 
 		msg = g_strdup_printf ("compiled with unsupported SIMD extensions");
 		usable = FALSE;
 	}
+#endif
 
 	if (info->gc_name_index != -1) {
 		char *gc_name = (char*)&blob [info->gc_name_index];
