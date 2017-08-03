@@ -3241,7 +3241,12 @@ throw_exception (MonoObject *ex, gboolean rethrow)
 #endif
 	}
 
+#if defined(TARGET_WASM32)
+	void mono_wasm_throw_exception (MonoException *exc);
+	mono_wasm_throw_exception(mono_ex);
+#else
 	mono_llvm_cpp_throw_exception ();
+#endif
 }
 
 void
