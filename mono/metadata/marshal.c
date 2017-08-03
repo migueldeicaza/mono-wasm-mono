@@ -2415,6 +2415,7 @@ emit_struct_free (MonoMethodBuilder *mb, MonoClass *klass, int struct_var)
 static void
 emit_thread_interrupt_checkpoint_call (MonoMethodBuilder *mb, gpointer checkpoint_func)
 {
+#if !defined(TARGET_WASM32) || !defined(COMPILE_WASM32)
 	int pos_noabort, pos_noex;
 
 	mono_mb_emit_byte (mb, MONO_CUSTOM_PREFIX);

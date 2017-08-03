@@ -75,6 +75,7 @@ mono_llvm_build_atomic_load (LLVMBuilderRef builder, LLVMValueRef PointerVal,
 	LoadInst *ins = unwrap(builder)->CreateLoad(unwrap(PointerVal), is_volatile, Name);
 
 	ins->setAlignment (alignment);
+#if !defined(COMPILE_WASM32)
 	switch (barrier) {
 	case LLVM_BARRIER_NONE:
 		break;
@@ -88,6 +89,7 @@ mono_llvm_build_atomic_load (LLVMBuilderRef builder, LLVMValueRef PointerVal,
 		g_assert_not_reached ();
 		break;
 	}
+#endif
 
 	return wrap(ins);
 }
@@ -110,6 +112,7 @@ mono_llvm_build_store (LLVMBuilderRef builder, LLVMValueRef Val, LLVMValueRef Po
 {
 	StoreInst *ins = unwrap(builder)->CreateStore(unwrap(Val), unwrap(PointerVal), is_volatile);
 
+#if !defined(COMPILE_WASM32)
 	switch (barrier) {
 	case LLVM_BARRIER_NONE:
 		break;
@@ -123,6 +126,7 @@ mono_llvm_build_store (LLVMBuilderRef builder, LLVMValueRef Val, LLVMValueRef Po
 		g_assert_not_reached ();
 		break;
 	}
+#endif
 
 	return wrap(ins);
 }
@@ -142,15 +146,28 @@ mono_llvm_build_aligned_store (LLVMBuilderRef builder, LLVMValueRef Val, LLVMVal
 LLVMValueRef
 mono_llvm_build_cmpxchg (LLVMBuilderRef builder, LLVMValueRef ptr, LLVMValueRef cmp, LLVMValueRef val)
 {
+#if defined(COMPILE_WASM32)
+        return NULL;
+#else
 	AtomicCmpXchgInst *ins;
 
 	ins = unwrap(builder)->CreateAtomicCmpXchg (unwrap(ptr), unwrap (cmp), unwrap (val), SequentiallyConsistent, SequentiallyConsistent);
 	return wrap (ins);
+#endif
 }
 
 LLVMValueRef
 mono_llvm_build_atomic_rmw (LLVMBuilderRef builder, AtomicRMWOp op, LLVMValueRef ptr, LLVMValueRef val)
 {
+#if defined(COMPILE_WASM32)
+	switch (op) {
+	case LLVM_ATOMICRMW_OP_XCHG:
+		mono_llvm_build_store (builder, val, ptr, false,  LLVM_BARRIER_NONE);
+		return val;
+	case LLVM_ATOMICRMW_OP_ADD:
+		return LLVMBuildAdd (builder, val, mono_llvm_build_load (builder, ptr, "", false), "");
+	}
+#else
 	AtomicRMWInst::BinOp aop = AtomicRMWInst::Xchg;
 	AtomicRMWInst *ins;
 
@@ -168,11 +185,15 @@ mono_llvm_build_atomic_rmw (LLVMBuilderRef builder, AtomicRMWOp op, LLVMValueRef
 
 	ins = unwrap (builder)->CreateAtomicRMW (aop, unwrap (ptr), unwrap (val), SequentiallyConsistent);
 	return wrap (ins);
+#endif
 }
 
 LLVMValueRef
 mono_llvm_build_fence (LLVMBuilderRef builder, BarrierKind kind)
 {
+#if defined(COMPILE_WASM32)
+	return NULL;
+#else
 	FenceInst *ins;
 	AtomicOrdering ordering;
 
@@ -195,6 +216,7 @@ mono_llvm_build_fence (LLVMBuilderRef builder, BarrierKind kind)
 
 	ins = unwrap (builder)->CreateFence (ordering);
 	return wrap (ins);
+#endif
 }
 
 void

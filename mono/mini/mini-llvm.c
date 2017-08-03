@@ -5514,11 +5514,28 @@ process_bb (EmitContext *ctx, MonoBasicBlock *bb)
 			args [1] = convert (ctx, values [ins->sreg3], t);
 			/* new value */
 			args [2] = convert (ctx, values [ins->sreg2], t);
+#if defined(COMPILE_WASM32)
+			LLVMValueRef old = LLVMBuildLoad (builder, args [0], "");
+			LLVMValueRef cond = LLVMBuildICmp (builder, LLVMIntEQ, old, args [1], "");
+
+			LLVMBasicBlockRef store_bb = gen_bb (ctx, "STORE_BB");
+			LLVMBasicBlockRef cont_bb = gen_bb (ctx, "CONT_BB");
+			LLVMBuildCondBr (builder, cond, store_bb, cont_bb);
+
+			LLVMPositionBuilderAtEnd(builder, store_bb);
+			LLVMBuildStore (builder, args [2], args [0]);
+			LLVMBuildBr(builder, cont_bb);
+
+			LLVMPositionBuilderAtEnd(builder, cont_bb);
+			values [ins->dreg] = old;
+			ctx->bblocks [bb->block_num].end_bblock = cont_bb;
+#else
 			ARM64_ATOMIC_FENCE_FIX;
 			val = mono_llvm_build_cmpxchg (builder, args [0], args [1], args [2]);
 			ARM64_ATOMIC_FENCE_FIX;
 			/* cmpxchg returns a pair */
 			values [ins->dreg] = LLVMBuildExtractValue (builder, val, 0, "");
+#endif
 			break;
 		}
 		case OP_MEMORY_BARRIER: {
@@ -5614,7 +5631,9 @@ process_bb (EmitContext *ctx, MonoBasicBlock *bb)
 		}
 		case OP_RELAXED_NOP: {
 #if defined(TARGET_AMD64) || defined(TARGET_X86)
+# if !defined(COMPILE_WASM32)
 			emit_call (ctx, bb, &builder, get_intrinsic (ctx, "llvm.x86.sse2.pause"), NULL, 0);
+# endif
 			break;
 #else
 			break;
@@ -5646,6 +5665,7 @@ process_bb (EmitContext *ctx, MonoBasicBlock *bb)
 			break;
 		}
 		case OP_GC_SAFE_POINT: {
+#if !defined(COMPILE_WASM32)
 			LLVMValueRef val, cmp, callee;
 			LLVMBasicBlockRef poll_bb, cont_bb;
 			static LLVMTypeRef sig;
@@ -5680,6 +5700,7 @@ process_bb (EmitContext *ctx, MonoBasicBlock *bb)
 			ctx->builder = builder = create_builder (ctx);
 			LLVMPositionBuilderAtEnd (builder, cont_bb);
 			ctx->bblocks [bb->block_num].end_bblock = cont_bb;
+#endif
 			break;
 		}
 
@@ -5699,10 +5720,35 @@ process_bb (EmitContext *ctx, MonoBasicBlock *bb)
 		case OP_LMUL_OVF:
 		case OP_LMUL_OVF_UN:
 			{
-				LLVMValueRef args [2], val, ovf, func;
-
+				LLVMValueRef args [2];
 				args [0] = convert (ctx, lhs, op_to_llvm_type (ins->opcode));
 				args [1] = convert (ctx, rhs, op_to_llvm_type (ins->opcode));
+#if defined(COMPILE_WASM32)
+				LLVMValueRef val;
+				switch (ins->opcode) {
+					case OP_IADD_OVF:
+					case OP_IADD_OVF_UN:
+					case OP_LADD_OVF:
+					case OP_LADD_OVF_UN:
+						val = LLVMBuildAdd (builder, args [0], args [1], "");
+						break;
+					case OP_IMUL_OVF:
+					case OP_IMUL_OVF_UN:
+					case OP_LMUL_OVF:
+					case OP_LMUL_OVF_UN:
+						val = LLVMBuildMul (builder, args [0], args [1], "");
+						break;
+					case OP_ISUB_OVF:
+					case OP_ISUB_OVF_UN:
+					case OP_LSUB_OVF:
+					case OP_LSUB_OVF_UN:
+						val = LLVMBuildSub (builder, args [0], args [1], "");
+						break;
+				}
+				values [ins->dreg] = val;
+#else
+				LLVMValueRef val, ovf, func;
+
 				func = get_intrinsic (ctx, ovf_op_to_intrins (ins->opcode));
 				g_assert (func);
 				val = LLVMBuildCall (builder, func, args, 2, "");
@@ -5712,6 +5758,7 @@ process_bb (EmitContext *ctx, MonoBasicBlock *bb)
 				if (!ctx_ok (ctx))
 					break;
 				builder = ctx->builder;
+#endif
 				break;
 			}
 
