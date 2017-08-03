@@ -27,7 +27,7 @@ dump_arch (void)
 #elif defined (TARGET_ARM64)
 	g_print ("#ifdef TARGET_ARM64\n");
 #elif defined (TARGET_WASM32)
-	g_print ("#ifdef TARGET_WASM32\n");
+	g_print ("#ifdef COMPILE_WASM32\n");
 #else
 	return 0;
 #endif
@@ -45,6 +45,8 @@ dump_os (void)
 	g_print ("#ifdef TARGET_OSX\n");
 #elif defined (PLATFORM_IOS)
 	g_print ("#ifdef TARGET_IOS\n");
+#elif defined (TARGET_WASM32)
+	g_print ("#ifdef COMPILE_WASM32\n");
 #else
 	return 0;
 #endif
