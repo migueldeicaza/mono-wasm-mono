@@ -8494,6 +8494,10 @@ mono_llvm_create_aot_module (MonoAssembly *assembly, const char *global_prefix, 
 	memset (module, 0, sizeof (aot_module));
 
 	module->lmodule = LLVMModuleCreateWithName ("aot");
+#if defined(COMPILE_WASM32)
+	LLVMSetDataLayout(module->lmodule, "e-m:e-p:32:32-i64:64-n32:64-S128");
+	LLVMSetTarget(module->lmodule, "wasm32");
+#endif
 	module->assembly = assembly;
 	module->global_prefix = g_strdup (global_prefix);
 	module->got_symbol = g_strdup_printf ("%s_llvm_got", global_prefix);
