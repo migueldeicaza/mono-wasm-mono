@@ -31,6 +31,7 @@
 
 /* Disable desktop assembly loader semantics. */
 /* #undef DISABLE_DESKTOP_LOADER */
+#define DISABLE_DESKTOP_LOADER 1
 
 /* Disable generics support */
 /* #undef DISABLE_GENERICS */
@@ -43,7 +44,6 @@
 
 /* Disable the JIT, only full-aot mode will be supported by the runtime. */
 #define DISABLE_JIT 1
-#define DISABLE_JIT_OFFSETS 1
 
 /* Disable support for huge assemblies */
 /* #undef DISABLE_LARGE_CODE */
@@ -123,6 +123,9 @@
 
 /* Disables the verifier */
 /* #undef DISABLE_VERIFIER */
+
+#define DISABLE_MONO_AUTODETECTION 1
+#define DISABLE_SHADOW_COPY 1
 
 /* Enable checked build */
 /* #undef ENABLE_CHECKED_BUILD */
@@ -1076,7 +1079,7 @@
 /* #undef MONO_CROSS_COMPILE */
 
 /* Disable banned functions from being used by the runtime */
-#define MONO_INSIDE_RUNTIME 1
+//#define MONO_INSIDE_RUNTIME 1
 
 /* The LLVM back end is dynamically loaded */
 /* #undef MONO_LLVM_LOADED */
@@ -1126,6 +1129,7 @@
 
 /* This platform does not support symlinks */
 /* #undef PLATFORM_NO_SYMLINKS */
+#define PLATFORM_NO_SYMLINKS
 
 /* pthread is a pointer */
 #define PTHREAD_POINTER_ID 1
