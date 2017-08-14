@@ -386,8 +386,10 @@ register_thread (MonoThreadInfo *info)
 	mono_native_tls_set_value (thread_info_key, info);
 
 	mono_thread_info_get_stack_bounds (&staddr, &stsize);
+#if !defined(TARGET_WASM32)
 	g_assert (staddr);
 	g_assert (stsize);
+#endif
 	info->stack_start_limit = staddr;
 	info->stack_end = staddr + stsize;
 
@@ -1199,6 +1201,10 @@ mono_thread_info_is_async_context (void)
 void
 mono_thread_info_get_stack_bounds (guint8 **staddr, size_t *stsize)
 {
+#if defined(TARGET_WASM32)
+	*staddr = 0;
+	*stsize = 0;
+#else
 	guint8 *current = (guint8 *)&stsize;
 	mono_threads_platform_get_stack_bounds (staddr, stsize);
 	if (!*staddr)
@@ -1209,6 +1215,7 @@ mono_thread_info_get_stack_bounds (guint8 **staddr, size_t *stsize)
 
 	/* When running under emacs, sometimes staddr is not aligned to a page size */
 	*staddr = (guint8*)((gssize)*staddr & ~(mono_pagesize () - 1));
+#endif
 }
 
 gboolean

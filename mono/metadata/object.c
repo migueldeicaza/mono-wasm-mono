@@ -4096,7 +4096,9 @@ prepare_run_main (MonoMethod *method, int argc, char *argv[])
 
 	g_assert (method != NULL);
 	
+#if !defined(TARGET_WASM32)	
 	mono_thread_set_main (mono_thread_current ());
+#endif
 
 	main_args = g_new0 (char*, argc);
 	num_main_args = argc;
@@ -4794,7 +4796,9 @@ int
 mono_runtime_exec_main_checked (MonoMethod *method, MonoArray *args, MonoError *error)
 {
 	error_init (error);
+#if !defined(TARGET_WASM32)
 	prepare_thread_to_exec_main (mono_object_domain (args), method);
+#endif
 	return do_exec_main_checked (method, args, error);
 }
 

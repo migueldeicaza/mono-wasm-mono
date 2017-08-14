@@ -1112,9 +1112,11 @@ mono_thread_attach_full (MonoDomain *domain, gboolean force_attach)
 	thread = create_thread_object (domain, internal);
 
 	if (!mono_thread_attach_internal (thread, force_attach, TRUE)) {
+#if !defined(TARGET_WASM32)
 		/* Mono is shutting down, so just wait for the end */
 		for (;;)
 			mono_thread_info_sleep (10000, NULL);
+#endif
 	}
 
 	THREAD_DEBUG (g_message ("%s: Attached thread ID %"G_GSIZE_FORMAT" (handle %p)", __func__, tid, internal->handle));
