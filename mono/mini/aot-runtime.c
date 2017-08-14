@@ -2607,8 +2607,24 @@ compute_llvm_code_range (MonoAotModule *amodule, guint8 **code_start, guint8 **c
 	if (amodule->info.llvm_get_method) {
 		gpointer (*get_method) (int) = (gpointer (*)(int))amodule->info.llvm_get_method;
 
+#if defined(TARGET_WASM32)
+		*code_start = 0;
+		*code_end = 0;
+		for (int i = 0; i < amodule->info.nmethods; i++) {
+			guint8 *s = (guint8 *)get_method (i);
+			if (s > 0) {
+				if (*code_start == 0 || s < *code_start) {
+					*code_start = s;
+				}
+				if (s > *code_end) {
+					*code_end = s; // XXX needs some padding
+				}
+			}
+		}
+#else
 		*code_start = (guint8 *)get_method (-1);
 		*code_end = (guint8 *)get_method (-2);
+#endif
 
 		g_assert (*code_end > *code_start);
 		return;
@@ -3498,9 +3514,11 @@ mono_aot_find_jit_info (MonoDomain *domain, MonoImage *image, gpointer addr)
 		mono_jit_info_table_add (domain, jinfo);
 	}
 
+#if !defined(TARGET_WASM32)
 	if ((guint8*)addr >= (guint8*)jinfo->code_start + jinfo->code_size)
 		/* addr is in the padding between methods, see the adjustment of code_size in decode_exception_debug_info () */
 		return NULL;
+#endif
 	
 	return jinfo;
 }
