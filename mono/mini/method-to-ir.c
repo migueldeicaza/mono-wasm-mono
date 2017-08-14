@@ -76,7 +76,7 @@
 #include "aot-compiler.h"
 #include "mini-llvm.h"
 
-#if defined(COMPILE_WASM32) && defined(MONO_ARCH_SIMD_INTRINSICS)
+#if defined(COMPILE_WASM32)
 # undef MONO_ARCH_SIMD_INTRINSICS
 #endif
 
@@ -2688,6 +2688,9 @@ emit_extra_arg_calli (MonoCompile *cfg, MonoMethodSignature *fsig, MonoInst **or
 	tmp_reg = alloc_preg (cfg);
 	EMIT_NEW_UNALU (cfg, args [pindex], OP_MOVE, tmp_reg, arg_reg);
 	csig = sig_to_rgctx_sig (fsig);
+#if defined(COMPILE_WASM32)
+	csig->has_implicit_rgctx_arg = 1;
+#endif
 	return mini_emit_calli (cfg, csig, args, call_target, NULL, NULL);
 }
 

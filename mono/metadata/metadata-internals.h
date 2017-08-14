@@ -598,6 +598,9 @@ struct _MonoMethodSignature {
 	unsigned int  pinvoke             : 1;
 	unsigned int  is_inflated         : 1;
 	unsigned int  has_type_parameters : 1;
+#if defined(COMPILE_WASM32)
+	unsigned int  has_implicit_rgctx_arg : 1;
+#endif
 	MonoType     *params [MONO_ZERO_LEN_ARRAY];
 };
 

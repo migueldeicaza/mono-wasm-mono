@@ -1262,7 +1262,7 @@ sig_to_llvm_sig_no_cinfo (EmitContext *ctx, MonoMethodSignature *sig)
  * calling convention information in CINFO. Fill out the parameter mapping information in CINFO.
  */
 static LLVMTypeRef
-sig_to_llvm_sig_full (EmitContext *ctx, MonoMethodSignature *sig, LLVMCallInfo *cinfo)
+sig_to_llvm_sig_full (EmitContext *ctx, MonoMethodSignature *sig, LLVMCallInfo *cinfo, gboolean definition)
 {
 	LLVMTypeRef ret_type;
 	LLVMTypeRef *param_types = NULL;
@@ -1480,6 +1480,16 @@ sig_to_llvm_sig_full (EmitContext *ctx, MonoMethodSignature *sig, LLVMCallInfo *
 		pindex ++;
 	}
 
+#if defined(COMPILE_WASM32)
+        if (!definition && sig->has_implicit_rgctx_arg) {
+            pindex--;
+        }
+        if (definition && cinfo->rgctx_arg) {
+            pindex--;
+            cinfo->rgctx_arg_pindex = -1;
+        }
+#endif
+
 	res = LLVMFunctionType (ret_type, param_types, pindex, FALSE);
 	g_free (param_types);
 
@@ -1489,7 +1499,7 @@ sig_to_llvm_sig_full (EmitContext *ctx, MonoMethodSignature *sig, LLVMCallInfo *
 static LLVMTypeRef
 sig_to_llvm_sig (EmitContext *ctx, MonoMethodSignature *sig)
 {
-	return sig_to_llvm_sig_full (ctx, sig, NULL);
+	return sig_to_llvm_sig_full (ctx, sig, NULL, FALSE);
 }
 
 /*
@@ -3164,6 +3174,18 @@ emit_entry_bb (EmitContext *ctx, LLVMBuilderRef builder)
 	ctx->builder = old_builder;
 }
 
+#if defined(COMPILE_WASM32)
+static LLVMValueRef
+shared_rgctx_gvar (EmitContext *ctx)
+{
+    static LLVMValueRef __rgctx = 0;
+    if (__rgctx == 0) {
+        __rgctx = LLVMAddGlobal (ctx->lmodule, LLVMInt32Type (), "__rgctx");
+    }
+    return __rgctx;
+}
+#endif
+
 static void
 process_call (EmitContext *ctx, MonoBasicBlock *bb, LLVMBuilderRef *builder_ref, MonoInst *ins)
 {
@@ -3197,7 +3219,7 @@ process_call (EmitContext *ctx, MonoBasicBlock *bb, LLVMBuilderRef *builder_ref,
 
 	vretaddr = (cinfo->ret.storage == LLVMArgVtypeRetAddr || cinfo->ret.storage == LLVMArgVtypeByRef || cinfo->ret.storage == LLVMArgGsharedvtFixed || cinfo->ret.storage == LLVMArgGsharedvtVariable || cinfo->ret.storage == LLVMArgGsharedvtFixedVtype);
 
-	llvm_sig = sig_to_llvm_sig_full (ctx, sig, cinfo);
+	llvm_sig = sig_to_llvm_sig_full (ctx, sig, cinfo, FALSE);
 	if (!ctx_ok (ctx))
 		return;
 
@@ -3526,6 +3548,13 @@ process_call (EmitContext *ctx, MonoBasicBlock *bb, LLVMBuilderRef *builder_ref,
 	/*
 	 * Emit the call
 	 */
+
+#if defined(COMPILE_WASM32)
+        if (sig->has_implicit_rgctx_arg) {
+            LLVMValueRef rgctx_arg = args [LLVMCountParamTypes (llvm_sig)];
+            LLVMBuildStore (builder, rgctx_arg, shared_rgctx_gvar (ctx));
+         }
+#endif
 
 	lcall = emit_call (ctx, bb, &builder, callee, args, LLVMCountParamTypes (llvm_sig));
 
@@ -7017,7 +7046,7 @@ emit_method_inner (EmitContext *ctx)
 
 	if (cfg->rgctx_var)
 		linfo->rgctx_arg = TRUE;
-	ctx->method_type = method_type = sig_to_llvm_sig_full (ctx, sig, linfo);
+	ctx->method_type = method_type = sig_to_llvm_sig_full (ctx, sig, linfo, TRUE);
 	if (!ctx_ok (ctx))
 		return;
 
@@ -7071,6 +7100,7 @@ emit_method_inner (EmitContext *ctx)
 		LLVMAddFunctionAttr (method, LLVMNoInlineAttribute);
 
 	if (linfo->rgctx_arg) {
+#if !defined(COMPILE_WASM32)
 		ctx->rgctx_arg = LLVMGetParam (method, linfo->rgctx_arg_pindex);
 		ctx->rgctx_arg_pindex = linfo->rgctx_arg_pindex;
 		/*
@@ -7081,6 +7111,7 @@ emit_method_inner (EmitContext *ctx)
 		if (!ctx->llvm_only)
 			LLVMAddAttribute (ctx->rgctx_arg, LLVMInRegAttribute);
 		LLVMSetValueName (ctx->rgctx_arg, "rgctx");
+#endif
 	} else {
 		ctx->rgctx_arg_pindex = -1;
 	}
@@ -7267,6 +7298,12 @@ emit_method_inner (EmitContext *ctx)
 	LLVMBuilderRef entry_builder = create_builder (ctx);
 	LLVMBasicBlockRef entry_bb = get_bb (ctx, cfg->bb_entry);
 	LLVMPositionBuilderAtEnd (entry_builder, entry_bb);
+#if defined(COMPILE_WASM32)
+        if (linfo->rgctx_arg) {
+            ctx->rgctx_arg = LLVMBuildLoad (entry_builder, shared_rgctx_gvar (ctx), "rgctx");
+            ctx->rgctx_arg_pindex = -1;
+        }
+#endif
 	emit_entry_bb (ctx, entry_builder);
 
 	// Make landing pads first

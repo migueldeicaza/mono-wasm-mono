@@ -78,6 +78,10 @@
 #include "mini-llvm.h"
 #include "lldb.h"
 
+#if defined(COMPILE_WASM32)
+# undef TARGET_X86
+#endif
+
 MonoTraceSpec *mono_jit_trace_calls;
 MonoMethodDesc *mono_inject_async_exc_method;
 int mono_inject_async_exc_pos;

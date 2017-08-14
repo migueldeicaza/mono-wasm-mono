@@ -1247,6 +1247,9 @@ mini_get_gsharedvt_in_sig_wrapper (MonoMethodSignature *sig)
 	/* Rgctx arg */
 	gsharedvt_sig->params [pindex ++] = &mono_defaults.int_class->byval_arg;
 	gsharedvt_sig->param_count = pindex;
+#if defined(COMPILE_WASM32)
+	gsharedvt_sig->has_implicit_rgctx_arg = 1;
+#endif
 
 	// FIXME: Use shared signatures
 	mb = mono_mb_new (mono_defaults.object_class, sig->hasthis ? "gsharedvt_in_sig" : "gsharedvt_in_sig_static", MONO_WRAPPER_UNKNOWN);
@@ -1354,6 +1357,9 @@ mini_get_gsharedvt_out_sig_wrapper (MonoMethodSignature *sig)
 	memcpy (normal_sig, sig, mono_metadata_signature_size (sig));
 	normal_sig->param_count ++;
 	normal_sig->params [sig->param_count] = &mono_defaults.int_class->byval_arg;
+#if defined(COMPILE_WASM32)
+	normal_sig->has_implicit_rgctx_arg = 1;
+#endif
 
 	// FIXME: Use shared signatures
 	mb = mono_mb_new (mono_defaults.object_class, "gsharedvt_out_sig", MONO_WRAPPER_UNKNOWN);
