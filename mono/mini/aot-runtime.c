@@ -79,6 +79,10 @@
 #define ALIGN_PTR_TO(ptr,align) (gpointer)((((gssize)(ptr)) + (align - 1)) & (~(align - 1)))
 #define ROUND_DOWN(VALUE,SIZE)	((VALUE) & ~((SIZE) - 1))
 
+#if defined(TARGET_WASM32)
+int __rgctx = 0; // used by the compiler
+#endif
+
 typedef struct {
 	int method_index;
 	MonoJitInfo *jinfo;
