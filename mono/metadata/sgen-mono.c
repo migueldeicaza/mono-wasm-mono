@@ -1586,22 +1586,26 @@ mono_gc_get_managed_allocator_types (void)
 gboolean
 sgen_is_managed_allocator (MonoMethod *method)
 {
+#if !defined(TARGET_WASM32)
 	int i;
 
 	for (i = 0; i < ATYPE_NUM; ++i)
 		if (method == alloc_method_cache [i] || method == slowpath_alloc_method_cache [i] || method == profiler_alloc_method_cache [i])
 			return TRUE;
+#endif
 	return FALSE;
 }
 
 gboolean
 sgen_has_managed_allocator (void)
 {
+#if !defined(TARGET_WASM32)
 	int i;
 
 	for (i = 0; i < ATYPE_NUM; ++i)
 		if (alloc_method_cache [i] || slowpath_alloc_method_cache [i] || profiler_alloc_method_cache [i])
 			return TRUE;
+#endif
 	return FALSE;
 }
 
