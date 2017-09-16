@@ -17,6 +17,7 @@ PROFILE_MCS_FLAGS = \
 	-d:NET_4_0 \
 	-d:NET_4_5 \
 	-d:MOBILE,MOBILE_LEGACY \
+	-d:WASM \
 	-d:MONO \
 	-d:DISABLE_REMOTING \
 	-d:DISABLE_COM \
