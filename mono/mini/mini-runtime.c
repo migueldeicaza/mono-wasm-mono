@@ -4045,6 +4045,10 @@ register_icalls (void)
 	mono_add_internal_call ("Mono.Runtime::mono_runtime_cleanup_handlers",
 				mono_runtime_cleanup_handlers);
 
+#if defined(TARGET_WASM32)
+	mono_add_internal_call ("Mono.WebAssembly::JavaScriptEval", mono_wasm_js_eval);
+#endif
+
 #if defined(PLATFORM_ANDROID) || defined(TARGET_ANDROID)
 	mono_add_internal_call ("System.Diagnostics.Debugger::Mono_UnhandledException_internal",
 				mono_debugger_agent_unhandled_exception);

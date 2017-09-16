@@ -31,4 +31,6 @@ typedef struct {
     do { \
     } while(0)
 
+MonoString *mono_wasm_js_eval (MonoString *expr);
+
 #endif // __MONO_MINI_WASM32_H_
