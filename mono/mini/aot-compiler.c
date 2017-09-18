@@ -8697,7 +8697,13 @@ emit_llvm_file (MonoAotCompile *acfg)
 		optbc = g_strdup_printf ("%s.opt.bc", acfg->tmpbasename);
 	}
 
+#if COMPILE_WASM32
+	tempbc = optbc;
+#endif
 	mono_llvm_emit_aot_module (tempbc, g_path_get_basename (acfg->image->name));
+#if COMPILE_WASM32
+	return TRUE;
+#endif
 
 	/*
 	 * FIXME: Experiment with adding optimizations, the -std-compile-opts set takes
