@@ -24,6 +24,7 @@ xbuild_14_SUBDIRS := build class tools/xbuild
 winaot_SUBDIRS := build class
 orbis_SUBDIRS := build class
 unreal_SUBDIRS := build class
+wasm_SUBDIRS := build class
 
 include build/rules.make
 
@@ -79,6 +80,7 @@ $(_boot_:%=profile-do--testing_aot_full--%):          profile-do--testing_aot_fu
 $(_boot_:%=profile-do--winaot--%):              profile-do--winaot--%:              profile-do--build--%
 $(_boot_:%=profile-do--orbis--%):              profile-do--orbis--%:              profile-do--build--%
 $(_boot_:%=profile-do--unreal--%):              profile-do--unreal--%:              profile-do--build--%
+$(_boot_:%=profile-do--wasm--%):              profile-do--wasm--%:              profile-do--build--%
 $(_boot_:%=profile-do--build--%):             profile-do--build--%:             profile-do--basic--%
 
 testcorlib:
