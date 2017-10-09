@@ -4046,7 +4046,7 @@ register_icalls (void)
 				mono_runtime_cleanup_handlers);
 
 #if defined(TARGET_WASM32)
-	mono_add_internal_call ("Mono.WebAssembly::JavaScriptEval", mono_wasm_js_eval);
+        mono_add_internal_call ("Mono.WebAssembly.Runtime::JavaScriptEval", mono_wasm_js_eval);
 #endif
 
 #if defined(PLATFORM_ANDROID) || defined(TARGET_ANDROID)
