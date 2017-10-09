@@ -80,12 +80,4 @@ namespace Mono {
 			return true;
 		}
 	}
-
-#if WASM
-        public class WebAssembly
-        {
-            [MethodImplAttribute (MethodImplOptions.InternalCall)]
-                public static extern string JavaScriptEval (string expr);
-        }
-#endif
 }
