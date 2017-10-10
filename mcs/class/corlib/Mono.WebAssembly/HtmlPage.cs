@@ -24,5 +24,12 @@ namespace Mono.WebAssembly
                 return new HtmlWindow("window");
             }
         }
+
+        public static HtmlDocument Document
+        {
+            get {
+                return new HtmlDocument("document");
+            }
+        }
     }
 }

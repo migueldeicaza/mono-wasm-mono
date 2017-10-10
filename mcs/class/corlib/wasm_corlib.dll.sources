@@ -2,5 +2,8 @@
 Mono.WebAssembly/Runtime.cs
 Mono.WebAssembly/Object.cs
 Mono.WebAssembly/HtmlPage.cs
+Mono.WebAssembly/HtmlNode.cs
 Mono.WebAssembly/HtmlWindow.cs
+Mono.WebAssembly/HtmlDocument.cs
+Mono.WebAssembly/HtmlElement.cs
 Mono.WebAssembly/BrowserInformation.cs
