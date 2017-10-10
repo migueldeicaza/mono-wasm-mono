@@ -1,5 +1,6 @@
 #include corlib.dll.sources
 Mono.WebAssembly/Runtime.cs
+Mono.WebAssembly/Object.cs
 Mono.WebAssembly/HtmlPage.cs
 Mono.WebAssembly/HtmlWindow.cs
 Mono.WebAssembly/BrowserInformation.cs

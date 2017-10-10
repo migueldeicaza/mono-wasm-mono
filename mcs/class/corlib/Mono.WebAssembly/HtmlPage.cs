@@ -21,7 +21,7 @@ namespace Mono.WebAssembly
         public static HtmlWindow Window
         {
             get {
-                return new HtmlWindow();
+                return new HtmlWindow("window");
             }
         }
     }
