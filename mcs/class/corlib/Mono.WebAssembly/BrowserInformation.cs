@@ -2,13 +2,50 @@ using System;
 
 namespace Mono.WebAssembly
 {
-    public class BrowserInformation
+    public class BrowserInformation : Object
     {
-        public string Name { get; internal set; }
-        public string BrowserVersion { get; internal set; }
-        public string UserAgent { get; internal set; }
-        public string Platform { get; internal set; }
-        public bool CookiesEnabled { get; internal set; }
-        public string ProductName { get; internal set; }
+        public BrowserInformation(string expr) : base(expr) {}
+
+        public string Name
+        {
+            get {
+                return Invoke("appName");
+            }
+        }
+
+        public string BrowserVersion
+        {
+            get {
+                return Invoke("appVersion");
+            }
+        }
+
+        public string UserAgent
+        {
+            get {
+                return Invoke("userAgent");
+            }
+        }
+
+        public string Platform
+        {
+            get {
+                return Invoke("platform");
+            }
+        }
+
+        public bool CookiesEnabled
+        {
+            get {
+                return Invoke("cookieEnabled") == "true";
+            }
+        }
+
+        public string ProductName
+        {
+            get {
+                return Invoke("appCodeName");
+            }
+        }
     }
 } 
