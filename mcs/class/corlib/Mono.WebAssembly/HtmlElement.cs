@@ -54,6 +54,19 @@ namespace Mono.WebAssembly
             }
         }
 
+        public string[] AttributeNames
+        {
+            get {
+                var res = Invoke("getAttributeNames()");
+                return res.Length > 0 ? res.Split(',') : new string[0];
+            }
+        }
+
+        public string GetAttribute(string name)
+        {
+            return Invoke("getAttribute(\"" + name + "\")");
+        }
+
         public string InnerText
         {
             get {
