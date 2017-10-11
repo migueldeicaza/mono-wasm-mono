@@ -6,6 +6,19 @@ namespace Mono.WebAssembly
     public class HtmlElement : HtmlNode
     {
         public HtmlElement(string expr) : base(expr) {}
+        public HtmlElement(int reference) : base(reference) {}
+
+        internal static List<HtmlElement>
+            ListFromReferences(string[] references)
+        {
+            var list = new List<HtmlElement>();
+
+            foreach (var reference in references) {
+                list.Add(new HtmlElement(Int32.Parse(reference)));
+            }
+
+            return list;
+        }
 
         public string Id
         { 
@@ -42,23 +55,16 @@ namespace Mono.WebAssembly
         public List<HtmlElement> Children
         {
             get {
-                var list = new List<HtmlElement>();
+                var references = InvokeArray("children", true);
 
-                var count = Int32.Parse(Invoke("children.length"));
-
-                for (int i = 0; i < count; i++) {
-                    list.Add(new HtmlElement(InvokeExpr("children[" + i + "]")));
-                }
-
-                return list;
+                return HtmlElement.ListFromReferences(references);
             }
         }
 
         public string[] AttributeNames
         {
             get {
-                var res = Invoke("getAttributeNames()");
-                return res.Length > 0 ? res.Split(',') : new string[0];
+                return InvokeArray("getAttributeNames()", false);
             }
         }
 
