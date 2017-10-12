@@ -23,5 +23,19 @@ namespace Mono.WebAssembly
 
             return HtmlElement.ListFromReferences(references); 
         }
+
+        public HtmlElement QuerySelector(string selector)
+        {
+            return new HtmlElement(InvokeExpr("querySelector(\"" + selector
+                        + "\")"));
+        }
+
+        public List<HtmlElement> QuerySelectorAll(string selector)
+        {
+            var references = InvokeArray("querySelectorAll(\"" + selector
+                    + "\")", true);
+
+            return HtmlElement.ListFromReferences(references); 
+        }
     }
 }
