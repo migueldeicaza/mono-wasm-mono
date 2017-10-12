@@ -73,6 +73,16 @@ namespace Mono.WebAssembly
             return Invoke("getAttribute(\"" + name + "\")");
         }
 
+        public void SetAttribute(string name, string value)
+        {
+            Invoke("setAttribute(\"" + name + "\", \"" + value + "\")");
+        }
+
+        public void RemoveAttribute(string name)
+        {
+            Invoke("removeAttribute(\"" + name + "\")");
+        }
+
         public string InnerText
         {
             get {
