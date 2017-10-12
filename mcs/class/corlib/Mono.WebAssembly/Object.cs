@@ -19,9 +19,14 @@ namespace Mono.WebAssembly
             InternalReference = reference;
         }
 
+        protected string UnwrapExpr()
+        {
+            return "mono_wasm_unwrap_obj(" + InternalReference + ")";
+        }
+
         protected string InvokeExpr(string expr)
         {
-            return "mono_wasm_unwrap_obj(" + InternalReference + ")." + expr;
+            return UnwrapExpr() + "." + expr;
         }
 
         protected string Invoke(string expr)
@@ -39,6 +44,12 @@ namespace Mono.WebAssembly
             var res = Runtime.JavaScriptEval(invoke_expr);
 
             return res.Length > 0 ? res.Split(',') : new string[0];
+        }
+
+        protected string InvokeWithArg(string expr_fmt, Object arg)
+        {
+            var expr = System.String.Format(expr_fmt, arg.UnwrapExpr());
+            return Invoke(expr);
         }
     }
 }

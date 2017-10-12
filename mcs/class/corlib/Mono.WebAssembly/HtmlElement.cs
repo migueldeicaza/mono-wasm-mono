@@ -61,6 +61,16 @@ namespace Mono.WebAssembly
             }
         }
 
+        public void AppendChild(HtmlElement e)
+        {
+            InvokeWithArg("appendChild({0})", e);
+        }
+
+        public void RemoveChild(HtmlElement e)
+        {
+            InvokeWithArg("removeChild({0})", e);
+        }
+
         public string[] AttributeNames
         {
             get {
