@@ -5,8 +5,8 @@ namespace Mono.WebAssembly
 {
     public class HtmlElement : HtmlNode
     {
-        public HtmlElement(string expr) : base(expr) {}
-        public HtmlElement(int reference) : base(reference) {}
+        internal HtmlElement(string expr) : base(expr) {}
+        internal HtmlElement(int reference) : base(reference) {}
 
         internal static List<HtmlElement>
             ListFromReferences(string[] references)

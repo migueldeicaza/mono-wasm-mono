@@ -4,7 +4,7 @@ namespace Mono.WebAssembly
 {
     public class HtmlWindow : Object
     {
-        public HtmlWindow(string expr) : base(expr) {}
+        internal HtmlWindow(string expr) : base(expr) {}
 
         public void Alert(string alertText)
         {

@@ -5,8 +5,8 @@ namespace Mono.WebAssembly
 {
     public abstract class HtmlNode : Object
     {
-        public HtmlNode(string expr) : base(expr) {}
-        public HtmlNode(int reference) : base(reference) {}
+        internal HtmlNode(string expr) : base(expr) {}
+        internal HtmlNode(int reference) : base(reference) {}
 
         public List<HtmlElement> GetElementsByTagName(string name)
         {

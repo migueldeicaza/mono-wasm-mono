@@ -7,14 +7,14 @@ namespace Mono.WebAssembly
     {
         private int InternalReference;
 
-        public Object(string expr)
+        internal Object(string expr)
         {
             InternalReference = Int32.Parse(
                     Runtime.JavaScriptEval("mono_wasm_wrap_obj(" + expr
                         + ")"));
         }
 
-        public Object(int reference)
+        internal Object(int reference)
         {
             InternalReference = reference;
         }

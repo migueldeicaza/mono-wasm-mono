@@ -4,7 +4,7 @@ namespace Mono.WebAssembly
 {
     public class HtmlDocument : HtmlNode
     {
-        public HtmlDocument(string expr) : base(expr) {}
+        internal HtmlDocument(string expr) : base(expr) {}
 
         public string Location
         {

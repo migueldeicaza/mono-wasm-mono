@@ -4,7 +4,7 @@ namespace Mono.WebAssembly
 {
     public class BrowserInformation : Object
     {
-        public BrowserInformation(string expr) : base(expr) {}
+        internal BrowserInformation(string expr) : base(expr) {}
 
         public string Name
         {
