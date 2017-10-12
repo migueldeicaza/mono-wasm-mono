@@ -29,7 +29,14 @@ namespace Mono.WebAssembly
 
         public HtmlElement GetElementById(string id)
         {
-            return new HtmlElement(InvokeExpr("getElementById(\"" + id + "\")"));
+            return new HtmlElement(InvokeExpr("getElementById(\"" + id
+                        + "\")"));
+        }
+
+        public HtmlElement CreateElement(string tag)
+        {
+            return new HtmlElement(InvokeExpr("createElement(\"" + tag
+                        + "\")"));
         }
     }
 }
