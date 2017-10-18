@@ -2205,8 +2205,10 @@ stack_walk_adapter (MonoStackFrameInfo *frame, MonoContext *ctx, gpointer data)
 void
 mono_stack_walk (MonoStackWalk func, gpointer user_data)
 {
+#if !defined(TARGET_WASM32)
 	StackWalkUserData ud = { func, user_data };
 	mono_get_eh_callbacks ()->mono_walk_stack_with_ctx (stack_walk_adapter, NULL, MONO_UNWIND_LOOKUP_ALL, &ud);
+#endif
 }
 
 /**
