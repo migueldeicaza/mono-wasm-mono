@@ -34,6 +34,9 @@ namespace Mono.WebAssembly
             get { 
                 return Invoke("id");
             }
+            set {
+                Invoke("id = \"" + value + "\"");
+            }
         }
 
         public string TagName
