@@ -20,6 +20,15 @@ namespace Mono.WebAssembly
             return list;
         }
 
+        internal static HtmlElement ElementOrNull(string expr)
+        {
+            int reference = WrapExpr(expr);
+            if (reference == -1) {
+                return null;
+            }
+            return new HtmlElement(reference);
+        }
+
         public string Id
         { 
             get { 
@@ -48,11 +57,7 @@ namespace Mono.WebAssembly
         public HtmlElement Parent
         {
             get {
-                int reference = WrapExpr(InvokeExpr("parentElement"));
-                if (reference == -1) {
-                    return null;
-                }
-                return new HtmlElement(reference);
+                return ElementOrNull(InvokeExpr("parentElement"));
             }
         }
 

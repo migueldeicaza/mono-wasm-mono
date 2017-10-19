@@ -29,8 +29,8 @@ namespace Mono.WebAssembly
 
         public HtmlElement GetElementById(string id)
         {
-            return new HtmlElement(InvokeExpr("getElementById(\"" + id
-                        + "\")"));
+            return HtmlElement.ElementOrNull(InvokeExpr("getElementById(\""
+                        + id + "\")"));
         }
 
         public HtmlElement CreateElement(string tag)
