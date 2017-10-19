@@ -48,7 +48,11 @@ namespace Mono.WebAssembly
         public HtmlElement Parent
         {
             get {
-                return new HtmlElement(InvokeExpr("parent"));
+                int reference = WrapExpr(InvokeExpr("parentElement"));
+                if (reference == -1) {
+                    return null;
+                }
+                return new HtmlElement(reference);
             }
         }
 
