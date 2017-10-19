@@ -51,5 +51,19 @@ namespace Mono.WebAssembly
             var expr = System.String.Format(expr_fmt, arg.UnwrapExpr());
             return Invoke(expr);
         }
+
+        public override bool Equals(System.Object obj) 
+        {
+            if (obj == null || GetType() != obj.GetType())  {
+                return false;
+            }
+            return InternalReference == (obj as Object).InternalReference;
+        }
+
+        public override int GetHashCode()
+        {
+            return InternalReference;
+        }
+
     }
 }
