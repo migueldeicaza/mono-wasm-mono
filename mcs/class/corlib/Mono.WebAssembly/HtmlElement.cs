@@ -115,5 +115,19 @@ namespace Mono.WebAssembly
                 Invoke("innerText = \"" + value + "\"");
             }
         }
+
+        public override string ToString()
+        {
+            var str = $"<{TagName}";
+
+            foreach (var name in AttributeNames) {
+                var value = GetAttribute(name);
+                str += $" {name}='{value}'";
+            }
+
+            str += ">";
+
+            return base.ToString() + " " + str;
+        }
     }
 }

@@ -70,5 +70,9 @@ namespace Mono.WebAssembly
             return InternalReference;
         }
 
+        public override string ToString()
+        {
+            return $"JS Object {InternalReference}";
+        }
     }
 }
