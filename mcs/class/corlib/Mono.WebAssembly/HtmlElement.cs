@@ -92,7 +92,8 @@ namespace Mono.WebAssembly
 
         public string GetAttribute(string name)
         {
-            return Invoke("getAttribute(\"" + name + "\")");
+            var ret = Invoke("getAttribute(\"" + name + "\")");
+            return ret == "null" ? null : ret;
         }
 
         public void SetAttribute(string name, string value)
