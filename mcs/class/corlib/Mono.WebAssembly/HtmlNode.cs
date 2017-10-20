@@ -26,8 +26,8 @@ namespace Mono.WebAssembly
 
         public HtmlElement QuerySelector(string selector)
         {
-            return new HtmlElement(InvokeExpr("querySelector(\"" + selector
-                        + "\")"));
+            return HtmlElement.ElementOrNull(InvokeExpr("querySelector(\""
+                        + selector + "\")"));
         }
 
         public List<HtmlElement> QuerySelectorAll(string selector)
