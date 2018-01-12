@@ -619,6 +619,9 @@ mono_context_init_checked (MonoDomain *domain, MonoError *error);
 gboolean
 mono_assembly_has_reference_assembly_attribute (MonoAssembly *assembly, MonoError *error);
 
+#if defined(TARGET_WASM32)
+MONO_API
+#endif
 GPtrArray*
 mono_domain_get_assemblies (MonoDomain *domain, gboolean refonly);
 
